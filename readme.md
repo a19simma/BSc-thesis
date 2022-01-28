@@ -8,7 +8,7 @@ pip install gym
 
 pip install stable-baselines3[extra]
 
-pip install matplotlib
+run main.py
 
 run tensorboard --logdir='LOG*DIR/PPO*{n}' in commandline for
 the tensorboard interface
