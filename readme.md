@@ -6,6 +6,8 @@ pip install vizdoom
 
 pip install gym
 
+install pytorch with the relevant settings from https://pytorch.org/
+
 pip install stable-baselines3[extra]
 
 run main.py
