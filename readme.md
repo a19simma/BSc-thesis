@@ -10,5 +10,5 @@ pip install stable-baselines3[extra]
 
 pip install matplotlib
 
-run tensorboard --logdir='LOG*DIR/PPO*{n}' in commandline for
+run tensorboard --logdir= logs in commandline for
 the tensorboard interface
