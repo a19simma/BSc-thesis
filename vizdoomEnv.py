@@ -20,7 +20,7 @@ class VizDoomTrain(Env):
         self.game.load_config(path)
         self.game.set_window_visible(False)
         self.game.init()
-        self.observation_space = Box(low=0, high=255, shape=(3, 240, 320), dtype=np.uint8)
+        self.observation_space = Box(low=0, high=255, shape=(3, 480, 640), dtype=np.uint8)
         self.action_space = Discrete(3) #Antalet actions agenten har
         """obs = self.game.get_state().screen_buffer
         arr = np.array(obs)
