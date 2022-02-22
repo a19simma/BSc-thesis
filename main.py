@@ -36,27 +36,28 @@ def optimize_ppo(trial):
 
 def optimize_agent(trial):
 
-    #model_params = optimize_agent(trial)
+    model_params = optimize_ppo(trial) #Den kallade till agentens optimering innan, som orsakade rekursivt problem
 
     env = VizDoomTrain('defend_the_center')
     #callback = TrainCallback(10000) #1h 18min ifall en save path vill läggas till
-    #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, **model_params)
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096, **model_params)
+    #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096)
     
     
     #n_steps ökas vid mer komplexa miljöer
+    model.learn(10000)
     #model.learn(total_timesteps=10000, callback=callback)
-    model.learn(total_timesteps=10000)
+    #model.learn(total_timesteps=10000)
 
-    #mean_reward, _ = evaluate_policy(model, VizDoomTrain('defend_the_center')(), n_eval_episodes=10)
-    #return -1 * mean_reward
-
+    mean_reward, _ = evaluate_policy(model, VizDoomTrain('defend_the_center')(), n_eval_episodes=10)
+    return -1 * mean_reward
+    #return
 
 
 if __name__ == '__main__':
     study = optuna.create_study()
     try:
-        study.optimize(optimize_agent, n_trials=100)
+        study.optimize(optimize_agent, n_trials=100, n_jobs=2, callbacks=TrainCallback(10000))
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
 
