@@ -6,9 +6,11 @@ pip install vizdoom
 
 pip install gym
 
+install pytorch with the relevant settings from https://pytorch.org/
+
 pip install stable-baselines3[extra]
 
-pip install matplotlib
+run main.py
 
 run tensorboard --logdir= logs in commandline for
 the tensorboard interface
