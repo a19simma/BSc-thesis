@@ -8,7 +8,7 @@ from stable_baselines3 import PPO
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
 # length of the number of buttons.
 
-LOG_DIR = '../vizdoomlog/defendcenter'
+LOG_DIR = 'logs/defend_the_center'
 
 env = VizDoomTrain('defend_the_center')
 
