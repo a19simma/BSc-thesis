@@ -3,6 +3,7 @@ from gym import Env
 from gym.spaces import Discrete, Box
 import numpy as np
 import pandas as pd
+import cv2
 
 
 # Basics methods for the vizdoom environment are:
@@ -17,12 +18,9 @@ class VizDoomTrain(Env):
         self.game.load_config(path)
         self.game.set_window_visible(False)
         self.game.init()
-        self.observation_space = Box(low=0, high=255, shape=(3, 240, 320), dtype=np.uint8)
+        self.observation_shape = (45, 80)
+        self.observation_space = Box(low=0, high=255, shape=self.observation_shape+(1,), dtype=np.uint8)
         self.action_space = Discrete(3)
-        """obs = self.game.get_state().screen_buffer
-        arr = np.array(obs)
-        print(arr.shape)"""
-
 
     def step(self, action):
         buttons = self.game.get_available_buttons_size()
@@ -34,7 +32,7 @@ class VizDoomTrain(Env):
         if self.game.get_state(): 
             ammo = self.game.get_state().game_variables[0]
             info = ammo
-            state = self.game.get_state().screen_buffer
+            state = self.reshape(self.game.get_state().screen_buffer)
         else:
             state = np.zeros(self.observation_space.shape)
             info = 0 
@@ -45,10 +43,13 @@ class VizDoomTrain(Env):
     def reset(self):
         self.game.new_episode()
         state = self.game.get_state().screen_buffer
-        return state
+        return self.reshape(state)
 
-    def render(self):
-        pass
+    def reshape(self, observation):
+        grayscale = cv2.cvtColor(np.moveaxis(observation, 0, -1), cv2.COLOR_BGR2GRAY)
+        resize = cv2.resize(grayscale, self.observation_shape, interpolation=cv2.INTER_CUBIC)
+        state = np.reshape(resize, self.observation_shape+(1,))
+        return state
 
     def close(self):
         self.game.close()
