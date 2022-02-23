@@ -16,4 +16,4 @@ callback = TrainCallback(10000)
 
 model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=2048)
 
-model.learn(total_timesteps=70000, callback=callback)
+model.learn(total_timesteps=150000, callback=callback)
