@@ -18,7 +18,7 @@ class VizDoomTrain(Env):
         self.game.load_config(path)
         self.game.set_window_visible(False)
         self.game.init()
-        self.observation_shape = (45, 80)
+        self.observation_shape = (42, 42)
         self.observation_space = Box(low=0, high=255, shape=self.observation_shape+(1,), dtype=np.uint8)
         self.action_space = Discrete(3)
 
