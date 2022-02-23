@@ -13,11 +13,12 @@ from stable_baselines3.common.monitor import Monitor
 SCENARIO = 'defend_the_center'
 LOG_DIR = 'logs/' + SCENARIO
 RUN_NAME = '100x100'
-new_logger = configure(LOG_DIR + '/data' + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
+logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard", "json"])
 
 env = VizDoomTrain(SCENARIO)
-env = Monitor(env, (LOG_DIR + '/data' + '/' + RUN_NAME))
+env = Monitor(env, (LOG_DIR + '/' + RUN_NAME))
 
 callback = TrainCallback(50000, RUN_NAME)
-model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR + '/tensorboard', verbose=1, learning_rate=0.0001, n_steps=2048)
+model = PPO('CnnPolicy', env, verbose=1, learning_rate=0.0001, n_steps=2048)
+model.set_logger(logger)
 model.learn(total_timesteps=150000, callback=callback)
