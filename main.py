@@ -27,10 +27,10 @@ def optimize_ppo(trial):
         'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),
         'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),
         'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),
-        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),
-        'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),
-        'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),
-        'lam': trial.suggest_uniform('lam', 0.8, 1.)       
+        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1)#,
+        #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),
+        #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),
+        #'lam': trial.suggest_uniform('lam', 0.8, 1.)       
     }
 
 
@@ -40,7 +40,7 @@ def optimize_agent(trial):
 
     env = VizDoomTrain('defend_the_center')
     #callback = TrainCallback(10000) #1h 18min ifall en save path vill läggas till
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096, **model_params)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, **model_params)
     #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096)
     
     
@@ -57,7 +57,7 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     study = optuna.create_study()
     try:
-        study.optimize(optimize_agent, n_trials=100, n_jobs=2, callbacks=TrainCallback(10000))
+        study.optimize(optimize_agent, n_trials=100, callbacks=TrainCallback(10000))
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
 
