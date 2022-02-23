@@ -40,7 +40,7 @@ def optimize_agent(trial):
 
     env = VizDoomTrain('defend_the_center')
     #callback = TrainCallback(10000) #1h 18min ifall en save path vill läggas till
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, learning_rate=0.0001, n_steps=4096, verbose=1, **model_params)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, learning_rate=0.0001, n_steps=2048, verbose=1, **model_params)
     #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096)
     
     
