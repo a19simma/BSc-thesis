@@ -14,7 +14,7 @@ class VizDoomTrain(Env):
     def __init__(self, scenario):
         super().__init__()
         path = 'vizdoom/scenarios/' + scenario + '.cfg'
-        self.game = DoomGame()
+        self.game = DoomGame() #type: ignore
         self.game.load_config(path)
         self.game.set_window_visible(False)
         self.game.init()
