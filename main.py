@@ -12,7 +12,7 @@ LOG_DIR = 'logs/defend_the_center'
 
 env = VizDoomTrain('defend_the_center')
 
-callback = TrainCallback(10000)
+callback = TrainCallback(50000, '100x100')
 
 model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=2048)
 
