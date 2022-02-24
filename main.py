@@ -45,11 +45,15 @@ def optimize_agent(trial):
     
     
     #n_steps ökas vid mer komplexa miljöer
-    model.learn(10000)
+    model.learn(2000)
     #model.learn(total_timesteps=10000, callback=callback)
     #model.learn(total_timesteps=10000)
 
-    mean_reward, _ = evaluate_policy(model, VizDoomTrain('defend_the_center'), n_eval_episodes=10)
+
+    #mean_reward, _ = evaluate_policy(model, VizDoomTrain('defend_the_center'), n_eval_episodes=10)
+
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
+
     return -1 * mean_reward
     #return
 
