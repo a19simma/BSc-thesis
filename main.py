@@ -61,7 +61,7 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     study = optuna.create_study()
     try:
-        study.optimize(optimize_agent, n_trials=3)
+        study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
 
