@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 from stable_baselines3.common import env_checker
 from stable_baselines3 import PPO
 
+from stable_baselines3.common.monitor import Monitor
+
 from stable_baselines3.common.evaluation import evaluate_policy #Använder inte dessa egentligen
 from stable_baselines3.common.env_util import make_vec_env #  cmd_util har döpts om till env_util, men har deprekerats och kommer tas bort i framtiden
 
@@ -22,15 +24,19 @@ sys.setrecursionlimit(800)
 
 LOG_DIR = '../vizdoomlog/logs'
 
+
+
 def optimize_ppo(trial):
     return{
-        #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),
-        'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),
-        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),
-        #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),
-        #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),
-        #'lam': trial.suggest_uniform('lam', 0.8, 1.)       
+        #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
+        'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                           Fungerar
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#              Fungerar
+        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                      Fungerar
+        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
+        'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                      Fungerar
+        #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),                         Fungerar inte
+        #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
+        #'lam': trial.suggest_uniform('lam', 0.8, 1.)                                       Fungerar inte
     }
 
 
@@ -45,17 +51,13 @@ def optimize_agent(trial):
     
     
     #n_steps ökas vid mer komplexa miljöer
-    model.learn(10000, callback=callback)
+    model.learn(total_timesteps=2000, callback=callback)
     #model.learn(total_timesteps=10000, callback=callback)
-    #model.learn(total_timesteps=10000)
 
-
-    #mean_reward, _ = evaluate_policy(model, VizDoomTrain('defend_the_center'), n_eval_episodes=10)
-
-    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
-
+#Evaluation environment is not wrapped with a ''Monitor''  wrapper, med det nedan får vi inget error men vi får inte heller hela den utskrift vi vill ha.
+    monitor_env = Monitor(env)
+    mean_reward, _ = evaluate_policy(model, monitor_env, n_eval_episodes=10) #Den wrappar inte environment här, så man får error
     return -1 * mean_reward
-    #return
 
 
 if __name__ == '__main__':
