@@ -51,19 +51,19 @@ def optimize_agent(trial):
     
     
     #n_steps ökas vid mer komplexa miljöer
-    model.learn(total_timesteps=2000, callback=callback)
+    model.learn(total_timesteps=70000, callback=callback)
     #model.learn(total_timesteps=10000, callback=callback)
 
 #Evaluation environment is not wrapped with a ''Monitor''  wrapper, med det nedan får vi inget error men vi får inte heller hela den utskrift vi vill ha.
     monitor_env = Monitor(env)
-    mean_reward, _ = evaluate_policy(model, monitor_env, n_eval_episodes=10) #Den wrappar inte environment här, så man får error
+    mean_reward, _ = evaluate_policy(model, monitor_env, n_eval_episodes=10) 
     return -1 * mean_reward
 
 
 if __name__ == '__main__':
-    study = optuna.create_study()
+    study = optuna.create_study(study_name='FirstMassOPT')
     try:
-        study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
+        study.optimize(optimize_agent, n_trials=100, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
 
