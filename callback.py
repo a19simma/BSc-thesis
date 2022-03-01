@@ -2,10 +2,10 @@ import os
 from stable_baselines3.common.callbacks import BaseCallback
 
 class TrainCallback(BaseCallback):
-    def __init__(self, check_freq, verbose=1, modelname='model'):
+    def __init__(self, check_freq, path, verbose=1,):
         super(TrainCallback, self).__init__(verbose)
         self.check_freq = check_freq
-        self.save_path = 'logs/models' + '/' + modelname
+        self.save_path = path + '/models'
 
     def __init__callback(self):
         if self.save_path is not None:
