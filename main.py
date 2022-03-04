@@ -3,17 +3,38 @@ from callback import TrainCallback
 from matplotlib import pyplot as plt
 from stable_baselines3.common import env_checker
 from stable_baselines3 import PPO
+from stable_baselines3.common.logger import configure
+from stable_baselines3.common.monitor import Monitor
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
 # length of the number of buttons.
 
-LOG_DIR = 'logs/defend_the_center'
+SCENARIO = 'defend_the_center'
+LOG_DIR = 'logs/' + SCENARIO
 
-env = VizDoomTrain('defend_the_center')
+#schulman PPO paper from 2017 parameters GAE params and Discount is 
+# not changed. The stable baselines3 PPO implementation is using the same
+# defaults as in the paper's Mujoco experiment.
 
-callback = TrainCallback(10000)
+model_params = {
+    'n_steps': 2048,
+    'learning_rate': 1e-2,
+    'n_epochs': 10,
+    #'gamma': 0.99,
+    #'gae_lambda': 0.95,
+    'batch_size': 64,
+}
 
-model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=2048)
+RUN_NAME = ''
+for key in model_params:
+    RUN_NAME += key + '=' + str(model_params[key]) + '_'
+RUN_NAME = RUN_NAME[:-1]
 
-model.learn(total_timesteps=70000, callback=callback)
+env = VizDoomTrain(SCENARIO)
+env = Monitor(env, (LOG_DIR + '/' + RUN_NAME))
+model = PPO('CnnPolicy', env, verbose=1, **model_params)
+logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
+model.set_logger(logger)
+callback = TrainCallback(50000, LOG_DIR + '/' + RUN_NAME)
+model.learn(total_timesteps=300000, callback=callback)
