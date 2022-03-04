@@ -1,7 +1,6 @@
 import optuna
 import sys
-from matplotlib import pyplot as plt
-from stable_baselines3.common import env_checker
+
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
 from stable_baselines3 import PPO
@@ -34,29 +33,28 @@ def optimize_ppo(trial):
 
 def optimize_agent(trial):
 
-    model_params = optimize_ppo(trial) 
+    model_params = optimize_ppo(trial) #Den kallade till agentens optimering innan, som orsakade rekursivt problem
 
-    RUN_NAME = ''
-    for key in model_params:
-        RUN_NAME += key + '=' + str(model_params[key]) + '_'
-    RUN_NAME = RUN_NAME[:-1]
-
-    env = VizDoomTrain(SCENARIO)
-    env = Monitor(env, (LOG_DIR + '/' + RUN_NAME))
+    env = VizDoomTrain('defend_the_center')
+    callback = TrainCallback(10000) #1h 18min ifall en save path vill läggas till
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=1, **model_params)
-    logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
-    model.set_logger(logger)
-    callback = TrainCallback(50000, LOG_DIR + '/' + RUN_NAME)
-    model.learn(total_timesteps=30000, callback=callback)
+    #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.0001, n_steps=4096)
+    
+    
+    #n_steps ökas vid mer komplexa miljöer
+    model.learn(total_timesteps=70000, callback=callback)
+    #model.learn(total_timesteps=10000, callback=callback)
 
-    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10) 
+#Evaluation environment is not wrapped with a ''Monitor''  wrapper, med det nedan får vi inget error men vi får inte heller hela den utskrift vi vill ha.
+    monitor_env = Monitor(env)
+    mean_reward, _ = evaluate_policy(model, monitor_env, n_eval_episodes=10) 
     return -1 * mean_reward
 
 
 if __name__ == '__main__':
-    study = optuna.create_study()
+    study = optuna.create_study(study_name='FirstMassOPT')
     try:
-        study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
+        study.optimize(optimize_agent, n_trials=100, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
 
