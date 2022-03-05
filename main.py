@@ -13,21 +13,24 @@ from bayes_opt.event import Events
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 20000
+TOTAL_TIMESTEPS = 3e5
 
+# Values between which the optimization will probe
 model_params_bounds = {
-    'learning_rate': (1e-1,1e-7),
+    'learning_rate': (1e-7,1e-1),
     'batch_size': (8,128),
     'train_freq': (1,50),
     'gradient_steps': (-1,10),
 }
+env = VizDoomTrain(SCENARIO)
+env = Monitor(env)
 
 def train_model(**model_params):
     
     #Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
     model_params = {
         'learning_rate': model_params['learning_rate'],
-        'buffer_size':  int(5e5), # size of the buffer because of ram limitations.
+        'buffer_size':  int(1e5), # size of the buffer was reduced because of ram limitations.
         'learning_starts': TOTAL_TIMESTEPS/20,
         'batch_size': int(model_params['batch_size']),
         'tau': 1.0,
@@ -41,25 +44,26 @@ def train_model(**model_params):
         RUN_NAME += key + '=' + str(model_params[key]) + '_'
         RUN_NAME = RUN_NAME[:-1]
 
-    env = VizDoomTrain(SCENARIO)
-    env = Monitor(env)
     model = DQN('CnnPolicy', env, verbose=1, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
     model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=512)
+    print(int(env.getReward()))
+    return 100.0
 
 optimizer = BayesianOptimization(
     f=train_model,
     pbounds=model_params_bounds,
     random_state=1,
 )
+
 optlogger = JSONLogger(path="./logs.json")
 optimizer.subscribe(Events.OPTIMIZATION_STEP, optlogger)
 
 optimizer.maximize(
     init_points=2,
-    n_iter=20,
+    n_iter=3,
 )
 
 print(optimizer.max)
