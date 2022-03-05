@@ -2,6 +2,7 @@ from vizdoom import *
 from gym import Env
 from gym.spaces import Discrete, Box
 import numpy as np
+import os.path
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
@@ -10,9 +11,9 @@ import numpy as np
 class VizDoomTrain(Env):
     def __init__(self, scenario):
         super().__init__()
-        path = 'vizdoom/scenarios/' + scenario + '.cfg'
         self.game = DoomGame() #type: ignore
-        self.game.load_config(path)
+        config = os.path.join(scenarios_path, scenario + '.cfg')
+        self.game.load_config(config)
         self.game.set_window_visible(False)
         self.game.set_screen_format(ScreenFormat.GRAY8) #type: ignore
         self.game.set_screen_resolution(ScreenResolution.RES_160X120) #type: ignore
