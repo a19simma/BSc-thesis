@@ -6,6 +6,7 @@ from stable_baselines3.common.monitor import Monitor
 from bayes_opt import BayesianOptimization
 from bayes_opt.logger import JSONLogger
 from bayes_opt.event import Events
+from bayes_opt.util import load_logs
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
@@ -57,6 +58,8 @@ optimizer = BayesianOptimization(
     pbounds=model_params_bounds,
     random_state=1,
 )
+
+load_logs(optimizer, logs=["./logs.json"])
 
 optlogger = JSONLogger(path="./logs.json")
 optimizer.subscribe(Events.OPTIMIZATION_STEP, optlogger)
