@@ -1,5 +1,5 @@
 from vizdoom import *
-from gym import GoalEnv
+from gym import Env
 from gym.spaces import Discrete, Box, Dict
 import numpy as np
 
@@ -7,7 +7,7 @@ import numpy as np
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
 # length of the number of buttons.
 #
-class VizDoomTrain(GoalEnv):
+class VizDoomTrain(Env):
     def __init__(self, scenario):
         super().__init__()
         path = 'vizdoom/scenarios/' + scenario + '.cfg'
@@ -40,6 +40,9 @@ class VizDoomTrain(GoalEnv):
         self.game.new_episode()
         state = self.game.get_state().screen_buffer
         return state
+    
+    def getReward(self):
+        return self.game.get_last_reward()
 
     def close(self):
         self.game.close()
