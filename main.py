@@ -1,40 +1,74 @@
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
-from matplotlib import pyplot as plt
-from stable_baselines3.common import env_checker
-from stable_baselines3 import PPO
+from stable_baselines3 import DQN
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
+from bayes_opt import BayesianOptimization
+from bayes_opt.logger import JSONLogger
+from bayes_opt.event import Events
+from bayes_opt.util import load_logs
+import os
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
 # length of the number of buttons.
 
-SCENARIO = 'defend_the_center'
+SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
+TOTAL_TIMESTEPS = 3e5
 
-#schulman PPO paper from 2017 parameters GAE params and Discount is 
-# not changed. The stable baselines3 PPO implementation is using the same
-# defaults as in the paper's Mujoco experiment.
-
-model_params = {
-    'n_steps': 2048,
-    'learning_rate': 1e-2,
-    'n_epochs': 10,
-    #'gamma': 0.99,
-    #'gae_lambda': 0.95,
-    'batch_size': 64,
+# Values between which the optimization will probe
+model_params_bounds = {
+    'learning_rate': (1e-7,1e-1),
+    'batch_size': (8,128),
+    'train_freq': (1,50),
+    'gradient_steps': (-1,10),
 }
-
-RUN_NAME = ''
-for key in model_params:
-    RUN_NAME += key + '=' + str(model_params[key]) + '_'
-RUN_NAME = RUN_NAME[:-1]
-
 env = VizDoomTrain(SCENARIO)
-env = Monitor(env, (LOG_DIR + '/' + RUN_NAME))
-model = PPO('CnnPolicy', env, verbose=1, **model_params)
-logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
-model.set_logger(logger)
-callback = TrainCallback(50000, LOG_DIR + '/' + RUN_NAME)
-model.learn(total_timesteps=300000, callback=callback)
+env = Monitor(env)
+
+def train_model(**model_params):
+    
+    #Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
+    model_params = {
+        'learning_rate': model_params['learning_rate'],
+        'buffer_size':  int(1e5), # size of the buffer was reduced because of ram limitations.
+        'learning_starts': TOTAL_TIMESTEPS/20,
+        'batch_size': int(model_params['batch_size']),
+        'tau': 1.0,
+        'gamma': 0.99,
+        'train_freq': int(model_params['train_freq']),
+        'gradient_steps': int(model_params['gradient_steps']),
+    }
+
+    RUN_NAME = ''
+    for key in model_params:
+        RUN_NAME += key + '=' + str(model_params[key]) + '_'
+        RUN_NAME = RUN_NAME[:-1]
+
+    model = DQN('CnnPolicy', env, verbose=1, **model_params)
+    logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
+    model.set_logger(logger)
+    callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=512)
+    print(int(env.getReward()))
+    return 100.0
+
+optimizer = BayesianOptimization(
+    f=train_model,
+    pbounds=model_params_bounds,
+    random_state=1,
+)
+
+if os.path.isfile('./logs.json'):
+    load_logs(optimizer, logs=["./logs.json"])
+
+logger = JSONLogger(path="./logs.json")
+optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
+
+optimizer.maximize(
+    init_points=2,
+    n_iter=3,
+)
+
+print(optimizer.max)
