@@ -1,16 +1,10 @@
 # installing dependencies
 
-requires python 3.7-3.9
+install pipenv using 'pip install pipenv'
 
-pip install vizdoom
+setup the environment with 'pipenv install'
 
-pip install gym
-
-install pytorch with the relevant settings from https://pytorch.org/
-
-pip install stable-baselines3[extra]
-
-run main.py
+run commands inside 'pipenv shell'
 
 run tensorboard --logdir= logs in commandline for
 the tensorboard interface
