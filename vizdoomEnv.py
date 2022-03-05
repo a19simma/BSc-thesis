@@ -4,6 +4,7 @@ from gym.spaces import Discrete, Box, Dict
 import numpy as np
 import os.path
 
+
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
 # length of the number of buttons.
