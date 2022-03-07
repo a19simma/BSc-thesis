@@ -1,13 +1,10 @@
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
-from stable_baselines3 import DQN
+from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
-from bayes_opt import BayesianOptimization
-from bayes_opt.logger import JSONLogger
-from bayes_opt.event import Events
-from bayes_opt.util import load_logs
-import os
+from stable_baselines3.common.evaluation import evaluate_policy
+import optuna
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
@@ -15,60 +12,44 @@ import os
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 3e5
+TOTAL_TIMESTEPS = 7e4
 
 # Values between which the optimization will probe
-model_params_bounds = {
-    'learning_rate': (1e-7,1e-1),
-    'batch_size': (8,128),
-    'train_freq': (1,50),
-    'gradient_steps': (-1,10),
-}
+
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)
 
-def train_model(**model_params):
-    
-    #Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
-    model_params = {
-        'learning_rate': model_params['learning_rate'],
-        'buffer_size':  int(1e5), # size of the buffer was reduced because of ram limitations.
-        'learning_starts': TOTAL_TIMESTEPS/20,
-        'batch_size': int(model_params['batch_size']),
-        'tau': 1.0,
-        'gamma': 0.99,
-        'train_freq': int(model_params['train_freq']),
-        'gradient_steps': int(model_params['gradient_steps']),
+#Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
+def optimize_ppo(trial):
+    return{
+        #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
+        'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                           Fungerar
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#              Fungerar
+        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                      Fungerar
+        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
+        'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                      Fungerar
+        #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),                         Fungerar inte
+        #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
+        #'lam': trial.suggest_uniform('lam', 0.8, 1.)                                       Fungerar inte
     }
-
+def optimize_agent(trial):
+    model_params = optimize_ppo(trial) 
     RUN_NAME = ''
     for key in model_params:
         RUN_NAME += key + '=' + str(model_params[key]) + '_'
         RUN_NAME = RUN_NAME[:-1]
 
-    model = DQN('CnnPolicy', env, verbose=1, **model_params)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=1, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=512)
-    print(int(env.getReward()))
-    return 100.0
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=32)
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10) 
+    return -1 * mean_reward
 
-optimizer = BayesianOptimization(
-    f=train_model,
-    pbounds=model_params_bounds,
-    random_state=1,
-)
-
-if os.path.isfile('./logs.json'):
-    load_logs(optimizer, logs=["./logs.json"])
-
-logger = JSONLogger(path="./logs.json")
-optimizer.subscribe(Events.OPTIMIZATION_STEP, logger)
-
-optimizer.maximize(
-    init_points=2,
-    n_iter=3,
-)
-
-print(optimizer.max)
+if __name__ == '__main__':
+    study = optuna.create_study()
+    try:
+        study.optimize(optimize_agent, n_trials=50, gc_after_trial=True)
+    except KeyboardInterrupt:
+        print('Interrupted by keyboard')
