@@ -44,7 +44,7 @@ class VizDoomTrain(Env):
         return state
     
     def getReward(self):
-        return self.game.get_last_reward()
+        return self.game.get_total_reward()
 
     def close(self):
         self.game.close()

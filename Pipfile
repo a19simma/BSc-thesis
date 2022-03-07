@@ -8,7 +8,7 @@ vizdoom = "*"
 gym = "*"
 stable-baselines3 = {extras = ["extra"], version = "*"}
 torch = "*"
-bayesian-optimization = "*"
+optuna = "*"
 
 [dev-packages]
 
