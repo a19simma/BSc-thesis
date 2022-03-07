@@ -3,12 +3,19 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
 
+[[source]]
+url = "https://download.pytorch.org/whl/cu113/"
+verify_ssl = true
+name = "downloadpytorch"
+
 [packages]
 vizdoom = "*"
 gym = "*"
 stable-baselines3 = {extras = ["extra"], version = "*"}
-torch = "*"
 optuna = "*"
+torch = "==1.10.2+cu113"
+torchvision = "==0.11.3+cu113"
+torchaudio = "==0.10.2+cu113"
 
 [dev-packages]
 

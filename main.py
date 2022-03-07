@@ -4,7 +4,6 @@ from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
-import os
 import optuna
 
 # Basics methods for the vizdoom environment are:
@@ -51,6 +50,6 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     study = optuna.create_study()
     try:
-        study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
+        study.optimize(optimize_agent, n_trials=50, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
