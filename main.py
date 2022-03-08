@@ -5,6 +5,7 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
+import threading
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
@@ -12,14 +13,10 @@ import optuna
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 7e4
+TOTAL_TIMESTEPS = 1e4
 
-# Values between which the optimization will probe
 
-env = VizDoomTrain(SCENARIO)
-env = Monitor(env)
-
-#Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
+#Defaults are taken from the 2017 paper by schulman et al. https://arxiv.org/abs/1707.06347
 def optimize_ppo(trial):
     return{
         #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
@@ -32,24 +29,27 @@ def optimize_ppo(trial):
         #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
         #'lam': trial.suggest_uniform('lam', 0.8, 1.)                                       Fungerar inte
     }
+
 def optimize_agent(trial):
     model_params = optimize_ppo(trial) 
-    RUN_NAME = ''
+    RUN_NAME = 'Trial_' + str(trial.number) + '_'
     for key in model_params:
         RUN_NAME += key + '=' + str(model_params[key]) + '_'
-        RUN_NAME = RUN_NAME[:-1]
+        RUN_NAME = RUN_NAME[:-1]   
 
+    env = VizDoomTrain(SCENARIO)
+    env = Monitor(env)
     model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=1, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=32)
-    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10) 
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1) #decrease frequency of output with log_interval
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
     return -1 * mean_reward
 
 if __name__ == '__main__':
     study = optuna.create_study()
     try:
-        study.optimize(optimize_agent, n_trials=50, gc_after_trial=True)
+        study.optimize(optimize_agent, n_trials=10, gc_after_trial=True, n_jobs=-1)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
