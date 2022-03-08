@@ -14,7 +14,6 @@ SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 TOTAL_TIMESTEPS = 3e5
 
-
 #Defaults are taken from the 2017 paper by schulman et al. https://arxiv.org/abs/1707.06347
 def optimize_ppo(trial):
     return{
@@ -43,12 +42,18 @@ def optimize_agent(trial):
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
     model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1) #decrease frequency of output with log_interval
-    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=3)
     return mean_reward
 
 if __name__ == '__main__':
-    study = optuna.create_study(direction='maximize')
+    # for the distributed solution a mysql server is needed with a database names optuna
+    STUDY_NAME = SCENARIO + "_PPO"
     try:
-        study.optimize(optimize_agent, n_trials=40, gc_after_trial=True, n_jobs=-1)
+        study = optuna.load_study(study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
+    except KeyError:
+        print('Could not find study, creating...')
+        study = optuna.create_study(direction='maximize', study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
+    try:
+        study.optimize(optimize_agent, n_trials=10, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
