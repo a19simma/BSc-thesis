@@ -13,7 +13,7 @@ from stable_baselines3.common.evaluation import evaluate_policy
 sys.setrecursionlimit(800)
 
 
-SCENARIO = 'defend_the_center'
+SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 
 
