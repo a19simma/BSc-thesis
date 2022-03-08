@@ -14,21 +14,18 @@ SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 TOTAL_TIMESTEPS = 3e5
 
-
 #Defaults are taken from the 2017 paper by schulman et al. https://arxiv.org/abs/1707.06347
 def optimize_ppo(trial):
     return{
-        #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
-        'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                           Fungerar
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#              Fungerar
-        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                      Fungerar
-        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
-        'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                      Fungerar
-        #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),                         Fungerar inte
-        #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
-        #'lam': trial.suggest_uniform('lam', 0.8, 1.)                                       Fungerar inte
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-7,1e-1),
+        'buffer_size':  int(1e5), # size of the buffer was reduced because of ram limitations.
+        'learning_starts': TOTAL_TIMESTEPS/20,
+        'batch_size':trial.suggest_loguniform('batch_size', 8,128),
+        'tau': 1.0,
+        'gamma': 0.99,
+        'train_freq': trial.suggest_loguniform('train_freq', 1,50),
+        'gradient_steps': trial.suggest_loguniform('gradient_steps', -1,10),
     }
-
 def optimize_agent(trial):
     model_params = optimize_ppo(trial) 
     RUN_NAME = 'Trial_' + str(trial.number) + '_'
