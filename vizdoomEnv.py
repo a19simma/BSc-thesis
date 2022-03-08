@@ -42,6 +42,9 @@ class VizDoomTrain(Env):
         self.game.new_episode()
         state = self.game.get_state().screen_buffer
         return state
+    
+    def getReward(self):
+        return self.game.get_total_reward()
 
     def close(self):
         self.game.close()
