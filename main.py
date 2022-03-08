@@ -5,7 +5,6 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
-import threading
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the 
@@ -13,7 +12,7 @@ import threading
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 1e4
+TOTAL_TIMESTEPS = 3e5
 
 
 #Defaults are taken from the 2017 paper by schulman et al. https://arxiv.org/abs/1707.06347
@@ -39,7 +38,7 @@ def optimize_agent(trial):
 
     env = VizDoomTrain(SCENARIO)
     env = Monitor(env)
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=1, **model_params)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=0, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
@@ -50,6 +49,6 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     study = optuna.create_study(direction='maximize')
     try:
-        study.optimize(optimize_agent, n_trials=10, gc_after_trial=True, n_jobs=-1)
+        study.optimize(optimize_agent, n_trials=40, gc_after_trial=True, n_jobs=-1)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
