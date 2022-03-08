@@ -14,7 +14,6 @@ SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 TOTAL_TIMESTEPS = 3e5
 
-
 #Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
 def optimize_ppo(trial):
     return{
@@ -46,8 +45,14 @@ def optimize_agent(trial):
     return mean_reward
 
 if __name__ == '__main__':
-    study = optuna.create_study(direction='maximize')
+    # for the distributed solution a mysql server is needed with a database names optuna
+    STUDY_NAME = SCENARIO + "_PPO"
     try:
-        study.optimize(optimize_agent, n_trials=40, gc_after_trial=True, n_jobs=-1)
+        study = optuna.load_study(study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
+    except KeyError:
+        print('Could not find study, creating...')
+        study = optuna.create_study(direction='maximize', study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
+    try:
+        study.optimize(optimize_agent, n_trials=10, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
