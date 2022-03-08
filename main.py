@@ -45,10 +45,10 @@ def optimize_agent(trial):
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
     model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1) #decrease frequency of output with log_interval
     mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
-    return -1 * mean_reward
+    return mean_reward
 
 if __name__ == '__main__':
-    study = optuna.create_study()
+    study = optuna.create_study(direction='maximize')
     try:
         study.optimize(optimize_agent, n_trials=10, gc_after_trial=True, n_jobs=-1)
     except KeyboardInterrupt:
