@@ -14,7 +14,6 @@ SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 TOTAL_TIMESTEPS = 3e5
 
-
 #Defaults are taken from the 2017 paper by schulman et al. https://arxiv.org/abs/1707.06347
 def optimize_ppo(trial):
     return{
@@ -52,8 +51,9 @@ if __name__ == '__main__':
     try:
         study = optuna.load_study(study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
     except KeyError:
-        print("Could not find study, creating...")
+        print('Could not find study, creating...')
         study = optuna.create_study(direction='maximize', study_name=STUDY_NAME, storage="mysql://root@localhost:3306/optuna")
+        
     try:
         study.optimize(optimize_agent, n_trials=40, gc_after_trial=True)
     except KeyboardInterrupt:
