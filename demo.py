@@ -9,7 +9,7 @@ import time
 import numpy as np
 
 DIR = "./logs/" + main.STUDY_NAME
-TRIAL_N = 0
+TRIAL_N = 3
 
 env = VizDoomTrain(main.SCENARIO, visible=True)
 env = Monitor(env)

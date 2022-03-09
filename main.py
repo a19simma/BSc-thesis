@@ -5,10 +5,12 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
+import sqlcon  # use this to save connection details for the RDB
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the
 # length of the number of buttons.
+
 
 SCENARIO = 'deadly_corridor'
 TOTAL_TIMESTEPS = 3e5
@@ -19,7 +21,7 @@ LOG_DIR = 'logs/' + STUDY_NAME
 # Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
 
 
-def optimize_ppo(trial):
+def optimize_params(trial):
     return{
         'learning_rate': trial.suggest_loguniform('learning_rate', 1e-7, 1),
         # size of the buffer was reduced because of ram limitations.
@@ -34,7 +36,7 @@ def optimize_ppo(trial):
 
 
 def optimize_agent(trial):
-    model_params = optimize_ppo(trial)
+    model_params = optimize_params(trial)
     RUN_NAME = 'Trial_' + str(trial.number) + '_'
     for key in model_params:
         RUN_NAME += key + '=' + str(model_params[key]) + '_'
@@ -58,8 +60,8 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     # for the distributed solution a mysql server is needed with a database names optuna
     study = optuna.create_study(direction='maximize', study_name=STUDY_NAME,
-                                storage="mysql://root@localhost:3306/optuna", load_if_exists=True)
+                                storage=sqlcon.con, load_if_exists=True)
     try:
-        study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
+        study.optimize(optimize_agent, n_trials=1, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
