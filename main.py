@@ -19,7 +19,7 @@ def optimize_ppo(trial):
     return{
         #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
         'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                           Fungerar
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#              Fungerar
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 0.05),#            Fungerar
         'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                      Fungerar
         #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
         'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                      Fungerar
