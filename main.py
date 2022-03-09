@@ -5,6 +5,7 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
+import sqlcon  # use this to save connection details for the RDB
 
 # Basics methods for the vizdoom environment are:
 # make_action which takes a list of button states given by an array of 0 or 1 with the
@@ -58,7 +59,7 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     # for the distributed solution a mysql server is needed with a database names optuna
     study = optuna.create_study(direction='maximize', study_name=STUDY_NAME,
-                                storage="mysql://root@localhost:3306/optuna", load_if_exists=True)
+                                storage=sqlcon.con, load_if_exists=True)
     try:
         study.optimize(optimize_agent, n_trials=3, gc_after_trial=True)
     except KeyboardInterrupt:
