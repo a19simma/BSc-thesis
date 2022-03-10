@@ -19,9 +19,9 @@ def optimize_ppo(trial):
     return{
         #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
         'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                           Fungerar
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 0.05),#            Fungerar
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#              Fungerar
         'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                      Fungerar
-        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
+        #'batch_size' : int(trial.suggest_loguniform('batch_size', 200, 2000)),#            Fungerar #Ökar vi batchsizen borde det gå mycket snabbare (För GPUer) Desto fler större batchsize desto fler GPU beräkningar, alltså borde det bli snabbare
         'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                      Fungerar
         #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),                         Fungerar inte
         #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
@@ -37,7 +37,7 @@ def optimize_agent(trial):
 
     env = VizDoomTrain(SCENARIO)
     env = Monitor(env)
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, verbose=0, **model_params)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, n_steps=2048, batch_size=2048, verbose=0, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
