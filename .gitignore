@@ -1,2 +1,5 @@
 .vscode
 logs
+__pycache__
+_vizdoom.ini
+logs.json
