@@ -1,3 +1,5 @@
+import sys
+sys.path.append('../')
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
 from matplotlib import pyplot as plt
@@ -9,18 +11,12 @@ from packaging import version
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-#TOTAL_TIMESTEPS = 1e5
-
-# set up logger
-logger = configure(LOG_DIR, ["stdout", "csv", "tensorboard"])
+TOTAL_TIMESTEPS = 3e5
 
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)
-
-callback = TrainCallback(10000)
-
-model = A2C('CnnPolicy', env, verbose=1)
-
+model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, learning_rate=0.0001, n_steps=2048)
+logger = configure(LOG_DIR, ["stdout", "csv", "tensorboard"])
 model.set_logger(logger)
-
-model.learn(total_timesteps=1000000, callback=callback)
+callback = TrainCallback(10000, LOG_DIR)
+model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1) #decrease frequency of output with log_interval
