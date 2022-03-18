@@ -13,7 +13,7 @@ import sqlcon  # use this to save connection details for the RDB
 
 
 SCENARIO = 'deadly_corridor'
-TOTAL_TIMESTEPS = 3e5
+TOTAL_TIMESTEPS = 5e5
 ALGORITHM = "DQN"
 STUDY_NAME = SCENARIO + "_" + ALGORITHM
 LOG_DIR = 'logs/' + STUDY_NAME
@@ -26,7 +26,7 @@ def optimize_params(trial):
         'learning_rate': trial.suggest_loguniform('learning_rate', 1e-7, 1),
         # size of the buffer was reduced because of ram limitations.
         'buffer_size':  int(1e5),
-        'learning_starts': trial.suggest_int('learning_starts', TOTAL_TIMESTEPS/100, TOTAL_TIMESTEPS/2),
+        'learning_starts': TOTAL_TIMESTEPS/20,
         'batch_size': trial.suggest_int('batch_size', 1, 128),
         'tau': trial.suggest_float('tau', 0, 1.0),
         'gamma': trial.suggest_float('gamma', 0, 1.0),
