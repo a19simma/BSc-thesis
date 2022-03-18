@@ -20,9 +20,9 @@ class VizDoomTrain(Env):
         self.game.set_screen_resolution(
             ScreenResolution.RES_160X120)  # type: ignore
         self.game.set_available_game_variables(
-            [GameVariable.SELECTED_WEAPON_AMMO, GameVariable.DAMAGE_TAKEN, GameVariable.HITCOUNT])  # type: ignore
+            [GameVariable.SELECTED_WEAPON_AMMO, GameVariable.DAMAGE_TAKEN, GameVariable.DAMAGECOUNT])  # type: ignore
         self.game.init()
-        self.hitcount = 0
+        self.damagecount = 0
         self.ammo = self.game.get_state().game_variables[0]
         self.damage_taken = 0
         self.observation_space = Box(
@@ -32,24 +32,24 @@ class VizDoomTrain(Env):
     def step(self, action):
         buttons = self.game.get_available_buttons_size()
         actions = np.identity(buttons)
-        if self.game.get_state():
-            ammo, damage_taken, hitcount = self.game.get_state().game_variables
-            state = self.game.get_state().screen_buffer
-        else:
-            state = np.zeros(self.observation_space.shape)
-            info = 0
         # second argument is the number of skipped tics, could be interesting to tweak.
         reward = self.game.make_action(actions[action], 4)
-        # Reward shaping to include other game variables and encourage desired behavior. Currently
-        # the agent simply runs it down mid.
-        reward = + 10*(self.hitcount-hitcount) + -1 * \
-            (self.ammo-ammo) + -5*(self.damage_taken-damage_taken)
+        if self.game.get_state():
+            ammo, damage_taken, damagecount = self.game.get_state().game_variables
+            state = self.game.get_state().screen_buffer
+            # Reward shaping to include other game variables and encourage desired behavior. Currently
+            # the agent simply runs it down mid.
+            reward += 300*(self.damagecount - damagecount) +  \
+                -5*(self.ammo-ammo) + -50*(self.damage_taken-damage_taken)
+            self.damagecount = damagecount
+            self.ammo = ammo
+            self.damage_taken = damage_taken
+            info = {"ammo": ammo, "damage_taken": damage_taken,
+                    "damagecount": damagecount}
+        else:
+            state = np.zeros(self.observation_space.shape)
+            info = {'info': 0}
 
-        self.hitcount = hitcount
-        self.ammo = ammo
-        self.damage_taken = damage_taken
-
-        info = {"ammo": ammo, "damage_taken": damage_taken, "hitcount": hitcount}
         done = self.game.is_episode_finished()
         return state, reward, done, info
 
