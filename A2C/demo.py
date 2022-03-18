@@ -1,3 +1,5 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from vizdoomEnv import VizDoomTrain
 from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.monitor import Monitor

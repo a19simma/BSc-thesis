@@ -2,7 +2,6 @@ from vizdoomEnv import VizDoomTrain
 from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
-import os
 import time
 import numpy as np
 import tkinter
