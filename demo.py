@@ -2,17 +2,13 @@ from vizdoomEnv import VizDoomTrain
 from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
-import main
 import os
 import time
 import numpy as np
 import tkinter
 from tkinter import filedialog
 
-DIR = "./logs/" + main.STUDY_NAME
-TRIAL_N = 0
-
-env = VizDoomTrain(main.SCENARIO, visible=True)
+env = VizDoomTrain('defend_the_center', visible=True)
 env = Monitor(env)
 tkinter.Tk().withdraw()
 model_dir = filedialog.askopenfilename()
