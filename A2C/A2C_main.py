@@ -9,9 +9,9 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from packaging import version
 
-SCENARIO = 'deadly_corridor'
+SCENARIO = 'deadly_corridor_rewtest'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 3e5
+TOTAL_TIMESTEPS = 1e6
 
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)

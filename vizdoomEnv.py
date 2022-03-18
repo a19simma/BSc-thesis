@@ -15,7 +15,7 @@ class VizDoomTrain(Env):
         self.game = DoomGame() #type: ignore
         config = os.path.join(scenarios_path, scenario + '.cfg')
         self.game.load_config(config)
-        self.game.set_window_visible(False)
+        self.game.set_window_visible(True)
         self.game.set_screen_format(ScreenFormat.GRAY8) #type: ignore
         self.game.set_screen_resolution(ScreenResolution.RES_160X120) #type: ignore
         self.game.init()
