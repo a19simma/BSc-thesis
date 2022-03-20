@@ -1,7 +1,7 @@
 import os, sys
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from vizdoomEnv import VizDoomTrain
+from vizdoomEnvA2C import VizDoomTrain
 from callback import TrainCallback
 from matplotlib import pyplot as plt
 from stable_baselines3.common import env_checker
@@ -10,7 +10,7 @@ from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from packaging import version
 
-SCENARIO = 'deadly_corridor_rewtest'
+SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
 TOTAL_TIMESTEPS = 1e6
 

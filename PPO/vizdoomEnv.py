@@ -21,7 +21,7 @@ class VizDoomGym(Env):
         # Inherit from Env
         super().__init__()
         # Setup the game 
-        self.game = DoomGame()
+        self.game = DoomGame() #type: ignore
         self.game.load_config(config)
         
         # Render frame logic
