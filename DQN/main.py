@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
 from stable_baselines3 import DQN, A2C, PPO
