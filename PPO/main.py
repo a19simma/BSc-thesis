@@ -37,16 +37,16 @@ def optimize_params(trial):
 
 
 def optimize_agent(trial):
-    #model_params = optimize_params(trial)
-    RUN_NAME = 'Trial_' + str(trial.number) #+ '_'
-    #for key in model_params:
-    #    RUN_NAME += key + '=' + str(model_params[key]) + '_'
-    #    RUN_NAME = RUN_NAME[:-1]
+    model_params = optimize_params(trial)
+    RUN_NAME = 'Trial_' + str(trial.number) + '_'
+    for key in model_params:
+        RUN_NAME += key + '=' + str(model_params[key]) + '_'
+        RUN_NAME = RUN_NAME[:-1]
 
     env = VizDoomTrain(SCENARIO)
     env = Monitor(env)
     #model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **model_params)
-    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=1, learning_rate=0.00001, n_steps=4096)
+    model = PPO('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, learning_rate=0.00001, n_steps=4096)
     logger = configure(LOG_DIR + '/' + RUN_NAME,
                        ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
