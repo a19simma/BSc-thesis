@@ -25,12 +25,12 @@ LOG_DIR = 'logs/' + STUDY_NAME
 
 def optimize_params(trial):
     return{
-        #'n_steps': int(trial.suggest_loguniform('n_steps', 16, 2048)),                     Fungerar
-        #'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                          Fungerar
-        #'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#             Fungerar
-        #'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                     Fungerar
-        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)),   Fungerar, men vi behöver den nog inte
-        #'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                     Fungerar
+        'n_steps': int(trial.suggest_loguniform('n_steps', 2048, 8192)),   #                  Fungerar
+        'gamma': trial.suggest_loguniform('gamma', 0.9, 0.9999),#                          Fungerar
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1.),#             Fungerar
+        'ent_coef': trial.suggest_loguniform('ent_coef', 1e-8, 1e-1),#                     Fungerar
+        #'batch_size' : int(trial.suggest_loguniform('batch_size', 1, n_steps * n_envs)), #  Fungerar, men vi behöver den nog inte
+        'n_epochs': int(trial.suggest_loguniform('n_epochs', 1, 48))#,                     Fungerar
         #'cliprange': trial.suggest_uniform('cliprange', 0.1, 0.4),                         Fungerar inte
         #'noptepochs': int(trial.suggest_loguniform('noptepochs', 1, 48)),                  Fungerar inte
         #'lam': trial.suggest_uniform('lam', 0.8, 1.)                                       Fungerar inte
@@ -62,7 +62,7 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     # for the distributed solution a mysql server is needed with a database names optuna
     study = optuna.create_study(direction='maximize', study_name=STUDY_NAME,
-                                storage="mysql://root@localhost/optuna", load_if_exists=True)
+                                storage="mysql://root@localhost/PPO", load_if_exists=True)
     try:
         study.optimize(optimize_agent, n_trials=1, gc_after_trial=True)
     except KeyboardInterrupt:
