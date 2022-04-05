@@ -37,7 +37,7 @@ class VizDoomTrain(Env):
         if self.game.get_state(): 
             state = self.game.get_state().screen_buffer
             game_variables = self.game.get_state().game_variables
-            damage_taken, killcount_delta, ammo = game_variables
+            ammo, damage_taken, killcount_delta = game_variables
             # Calculate reward deltas
             damage_taken_delta = -damage_taken + self.damage_taken
             self.damage_taken = damage_taken
