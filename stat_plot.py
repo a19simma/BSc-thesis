@@ -4,7 +4,7 @@ import seaborn as sns
 sns.set(style="darkgrid", palette="muted", color_codes=True)
 
 df_a2c = pd.read_csv("progress_a2c.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
-#df_dqn = pd.read_csv("logs/progress_dqn.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
+#df_dqn = pd.read_csv("progress_dqn.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
 #df_ppo = pd.read_csv("logs/progress_ppo.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
 
 df_a2c['mov_avg'] = df_a2c['rollout/ep_rew_mean'].rolling(20).mean()
