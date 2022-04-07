@@ -7,7 +7,7 @@ import numpy as np
 import tkinter
 from tkinter import filedialog
 
-env = VizDoomTrain('defend_the_center', visible=True)
+env = VizDoomTrain('deadly_corridor', visible=True)
 env = Monitor(env)
 tkinter.Tk().withdraw()
 model_dir = filedialog.askopenfilename()
@@ -22,6 +22,6 @@ for episode in range(10):
         obs = obs.reshape((-1,) + env.observation_space.shape)
         action = model.predict(obs)[0]
         obs, reward, done, info = env.step(action[0])
-        time.sleep(0.04)
+        time.sleep(0.10)
         total_reward += reward
     print("episode finished with a score of: " + str(total_reward))
