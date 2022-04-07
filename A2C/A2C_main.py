@@ -12,7 +12,7 @@ from packaging import version
 
 SCENARIO = 'deadly_corridor'
 LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 3e6
+TOTAL_TIMESTEPS = 1e6
 
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)

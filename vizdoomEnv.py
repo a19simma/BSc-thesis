@@ -10,16 +10,16 @@ import os.path
 # length of the number of buttons.
 #
 class VizDoomTrain(Env):
-    def __init__(self, scenario, visible=False):
+    def __init__(self, scenario, visible=True):
         super().__init__()
         self.game = DoomGame() #type: ignore
         config = os.path.join(scenarios_path, scenario + '.cfg')
         self.game.load_config(config)
-        self.game.set_window_visible(True)
+        self.game.set_window_visible(visible)
         self.game.set_screen_format(ScreenFormat.GRAY8) #type: ignore
         self.game.set_screen_resolution(ScreenResolution.RES_160X120) #type: ignore
         self.game.set_available_game_variables([GameVariable.SELECTED_WEAPON_AMMO, GameVariable.DAMAGE_TAKEN, GameVariable.HITCOUNT])  # type: ignore
-        self.game.set_doom_skill(3)
+        self.game.set_doom_skill(5)
         self.game.init()
         self.damagecount = 0
         self.ammo = self.game.get_state().game_variables[0]
@@ -33,6 +33,7 @@ class VizDoomTrain(Env):
         actions = np.identity(buttons)
         # second argument is the number of skipped tics, could be interesting to tweak.
         movement_reward = self.game.make_action(actions[action], 4)
+        print(movement_reward)
         reward = 0 
         if self.game.get_state(): 
             state = self.game.get_state().screen_buffer
@@ -62,4 +63,3 @@ class VizDoomTrain(Env):
 
     def close(self):
         self.game.close()
-
