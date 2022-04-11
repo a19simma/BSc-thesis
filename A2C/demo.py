@@ -15,7 +15,7 @@ env = VizDoomTrain(SCENARIO)
 env = Monitor(env)
 #model_dir = fnmatch.filter(os.listdir(DIR), "Trial_" + str(TRIAL_N) + "*")[0]
 
-model = PPO.load("best_model_280000")
+model = A2C.load("best_model_280000")
 for episode in range(10):
     obs = env.reset()
     done = False
