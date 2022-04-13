@@ -35,7 +35,7 @@ def optimize_params(trial):
         'batch_size': trial.suggest_int('batch_size', 1, 128), 
         #'tau': trial.suggest_int('tau', 0, 1), 
         'gamma': trial.suggest_float('gamma', 0, 1.0), 
-        'train_freq': ('episode', trial.suggest_int('train_freq', 1, 10)), 
+        'train_freq': (trial.suggest_int('train_freq', 1, 10), 'episode'), 
         'gradient_steps': trial.suggest_int('gradient_steps', 1, 10),
     }
 
