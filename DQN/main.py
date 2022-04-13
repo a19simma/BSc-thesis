@@ -57,7 +57,7 @@ def optimize_agent(trial):
     callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
     # decrease frequency of output with log_interval
     model.learn(total_timesteps=TOTAL_TIMESTEPS,
-                callback=callback, log_interval=4)
+                callback=callback, log_interval=20)
     mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
     return mean_reward
 
