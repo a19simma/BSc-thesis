@@ -16,24 +16,26 @@ import sqlcon  # use this to save connection details for the RDB
 
 
 SCENARIO = 'deadly_corridor'
-TOTAL_TIMESTEPS = 5e5
+TOTAL_TIMESTEPS = 1e6
 ALGORITHM = "DQN"
 STUDY_NAME = SCENARIO + "_" + ALGORITHM
 LOG_DIR = 'logs/' + STUDY_NAME
 
 # Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
-
+# 5 hyperparameters were chosen to optimize for each algorithm. 
+# Buffersize and learning starts were reduced compared to the original study to reflect the 
+# lower total timesteps
 
 def optimize_params(trial):
     return{
-        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-7, 1),
+        'learning_rate': trial.suggest_loguniform('learning_rate', 1e-5, 1), 
         # size of the buffer was reduced because of ram limitations.
-        'buffer_size':  int(1e5),
+        'buffer_size':  int(TOTAL_TIMESTEPS/40),
         'learning_starts': TOTAL_TIMESTEPS/20,
-        'batch_size': trial.suggest_int('batch_size', 1, 128),
-        'tau': trial.suggest_float('tau', 0, 1.0),
-        'gamma': trial.suggest_float('gamma', 0, 1.0),
-        'train_freq': trial.suggest_int('train_freq', 1, 2048),
+        'batch_size': trial.suggest_int('batch_size', 1, 128), 
+        #'tau': trial.suggest_int('tau', 0, 1), 
+        'gamma': trial.suggest_float('gamma', 0, 1.0), 
+        'train_freq': ('episode', trial.suggest_int('train_freq', 1, 10)), 
         'gradient_steps': trial.suggest_int('gradient_steps', 1, 10),
     }
 
