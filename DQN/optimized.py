@@ -14,7 +14,7 @@ import sqlcon  # use this to save connection details for the RDB
 # make_action which takes a list of button states given by an array of 0 or 1 with the
 # length of the number of buttons.
 
-SCENARIO = 'deadly_corridor_optimized'
+SCENARIO = 'deadly_corridor'
 TOTAL_TIMESTEPS = 1e6
 ALGORITHM = "DQN"
 STUDY_NAME = SCENARIO + "_optimized_" + ALGORITHM
