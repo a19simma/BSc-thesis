@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
 from stable_baselines3 import DQN, A2C, PPO
@@ -15,7 +18,7 @@ import sqlcon  # use this to save connection details for the RDB
 SCENARIO = 'deadly_corridor_optimized'
 TOTAL_TIMESTEPS = 1e6
 ALGORITHM = "DQN"
-STUDY_NAME = SCENARIO + "_" + ALGORITHM
+STUDY_NAME = SCENARIO + "_optimized_" + ALGORITHM
 LOG_DIR = 'logs/' + STUDY_NAME
 
 # Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
@@ -23,7 +26,7 @@ LOG_DIR = 'logs/' + STUDY_NAME
 # Buffersize and learning starts were reduced compared to the original study to reflect the 
 # lower total timesteps
 
-def params():
+def params(trial):
     return{
         'learning_rate': 1.9070714918537712e-05, 
         # size of the buffer was reduced because of ram limitations.

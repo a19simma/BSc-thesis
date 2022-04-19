@@ -1,3 +1,6 @@
+import os, sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from vizdoomEnv import VizDoomTrain
 from callback import TrainCallback
 from stable_baselines3 import DQN, A2C, PPO
@@ -12,10 +15,10 @@ import sqlcon  # use this to save connection details for the RDB
 # length of the number of buttons.
 
 
-SCENARIO = 'deadly_corridor_default'
+SCENARIO = 'deadly_corridor'
 TOTAL_TIMESTEPS = 1e6
 ALGORITHM = "DQN"
-STUDY_NAME = SCENARIO + "_" + ALGORITHM
+STUDY_NAME = SCENARIO + "_default_" + ALGORITHM
 LOG_DIR = 'logs/' + STUDY_NAME
 
 # Defaults are taken from the 2013 Nature paper.  https://arxiv.org/abs/1312.5602
@@ -23,7 +26,7 @@ LOG_DIR = 'logs/' + STUDY_NAME
 # Buffersize and learning starts were reduced compared to the original study to reflect the 
 # lower total timesteps
 
-def optimize_params():
+def optimize_params(trial):
     return{
         # size of the buffer was reduced because of ram limitations.
         'buffer_size':  int(TOTAL_TIMESTEPS/40),
