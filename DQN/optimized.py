@@ -38,6 +38,8 @@ def optimize_params():
         'gradient_steps': 10,
     }
 model_params = optimize_params()
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
 RUN_NAME = 'Trial_' + str(len(next(os.walk(LOG_DIR))[1])) + '_'
 for key in model_params:
     RUN_NAME += key + '=' + str(model_params[key]) + '_'
