@@ -4,11 +4,11 @@ import seaborn as sns
 sns.set(style="darkgrid", palette="muted", color_codes=True)
 
 df_dqn_default_1 = pd.read_csv("default_1.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
-#df_dqn_default_2 = pd.read_csv("default_2.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
-#df_dqn_default_3 = pd.read_csv("default_3.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
+df_dqn_default_2 = pd.read_csv("default_2.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
+df_dqn_default_3 = pd.read_csv("default_3.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
 df_dqn_optimized =  pd.read_csv("optimized_1.csv", usecols=['rollout/ep_rew_mean', 'time/total_timesteps'], sep=',')
 
-df_dqn_default_merged = df_dqn_default_1 #pd.concat([df_dqn_default_1,df_dqn_default_2,df_dqn_default_3], ignore_index=True)
+df_dqn_default_merged = pd.concat([df_dqn_default_1,df_dqn_default_2,df_dqn_default_3], ignore_index=True)
 
 df_dqn_default_merged['mean'] = df_dqn_default_merged.groupby('time/total_timesteps').mean()
 df_dqn_default_merged['mov_avg'] = df_dqn_default_merged['mean'].rolling(10).mean()
