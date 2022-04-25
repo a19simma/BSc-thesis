@@ -7,21 +7,16 @@ df_dqn_default_1 = pd.read_csv("default_1.csv", usecols=['rollout/ep_rew_mean', 
 df_dqn_default_2 = pd.read_csv("default_2.csv", usecols=['rollout/ep_rew_mean', 'time/episodes', 'time/total_timesteps'], sep=',')
 df_dqn_default_3 = pd.read_csv("default_3.csv", usecols=['rollout/ep_rew_mean', 'time/episodes', 'time/total_timesteps'], sep=',')
 df_dqn_default_4 = pd.read_csv("default_2.csv", usecols=['rollout/ep_rew_mean', 'time/episodes', 'time/total_timesteps'], sep=',')
-df_dqn_default_5 = pd.read_csv("default_3.csv", usecols=['rollout/ep_rew_mean', 'time/episodes', 'time/total_timesteps'], sep=',')
+df_dqn_default_5 = pd.read_csv("default_5.csv", usecols=['rollout/ep_rew_mean', 'time/episodes', 'time/total_timesteps'], sep=',')
 
 df_dqn_default_merged = pd.concat([df_dqn_default_1,df_dqn_default_2,df_dqn_default_3,df_dqn_default_4,df_dqn_default_5], ignore_index=True)
-#df_dqn_default_merged['mean'] = df_dqn_default_merged.groupby('time/episodes').mean()
-#df_dqn_default_merged['mov_avg'] = df_dqn_default_merged['mean'].rolling(10).mean()
 
-
-#sns.lineplot(x="time/total_timesteps", y="rollout/ep_rew_mean", label="A2C Learning Rate 0.00007", data=df_a2c, linewidth=1, color="green")
-#sns.lineplot(x="time/total_timesteps", y="mov_avg", data=df_a2c, label="Learning Rate 0.00007", linewidth=1, color="green")
-#sns.lineplot(x="time/total_timesteps", y="mov_avg", data=df_dqn, label="Learning Rate 0.0001", linewidth=1, color="purple")
 sns.lineplot(x='time/episodes', y="rollout/ep_rew_mean", label="DQN default",data=df_dqn_default_merged, linewidth=1, color="red", alpha=0.5)
-#sns.lineplot(x="time/total_timesteps", y="mov_avg", data=df_dqn_default_merged, marker='o', markevery=25, linewidth=2, color="blue", alpha=0.5)
-#sns.lineplot(x='time/episodes', y="rollout/ep_rew_mean", label="DQN optimized", data=df_dqn_optimized, linewidth=2, color="green", alpha=0.5)
+font = {'family' : 'DejaVu Sans',
+        'size'   : 14}
 
+plt.rc('font', **font)
 plt.xlabel("Episodes")
 plt.ylabel("Reward")
-plt.xlim(0,8.5e+3)
+plt.xlim(0,8.2e+3)
 plt.show()
