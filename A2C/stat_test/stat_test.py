@@ -36,3 +36,5 @@ else:
 statistic, pvalue = mannwhitneyu(data_default,data_optimized)
 
 print("p-value " + str(pvalue))
+print("mean of the default sample: " + str(np.mean(data_default)))
+print("mean of the optimized sample: " + str(np.mean(data_optimized)))
