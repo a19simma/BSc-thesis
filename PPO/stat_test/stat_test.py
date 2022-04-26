@@ -29,7 +29,7 @@ if not os.path.exists(model_dir + '\default_evaluation_sample.csv'):
         mean_reward, _ = evaluate_policy(default_model, env, n_eval_episodes=1)
         data_default.append(mean_reward)
     data_default = np.array(data_default) 
-    np.savetxt('default_evaluation_sample.csv', data_optimized)
+    np.savetxt('default_evaluation_sample.csv', data_default)
 else: 
     data_default = np.loadtxt('default_evaluation_sample.csv')
 
