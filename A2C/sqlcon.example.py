@@ -1,0 +1,1 @@
+con = "postgresql://a2c:asdf4321@host/optuna"

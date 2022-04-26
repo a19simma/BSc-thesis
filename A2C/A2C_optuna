@@ -8,19 +8,24 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
 
+# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
+# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
+# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
+
 SCENARIO = 'deadly_corridor'
-LOG_DIR = 'logs/' + SCENARIO
-TOTAL_TIMESTEPS = 3e5
+TOTAL_TIMESTEPS = 1e6
+ALGORITHM = "A2C"
+STUDY_NAME = SCENARIO + "_" + ALGORITHM
+LOG_DIR = 'logs/' + STUDY_NAME
+
 
 #Variables and ranges taken from Optunas a2c example https://github.com/optuna/optuna-examples/blob/main/rl/sb3_simple.py
 def optimize_a2c(trial):
     return{
-        'gamma': trial.suggest_float("gamma", 0.0001, 0.1, log=True),
-        'max_grad_norm': trial.suggest_float("max_grad_norm", 0.3, 5.0, log=True),
-        'gae_lambda': trial.suggest_float("gae_lambda", 0.001, 0.2, log=True),
-        'n_steps': trial.suggest_int("exponent_n_steps", 3, 10),
+        'gamma': trial.suggest_float("gamma", 0.1, 1, log=True),
+        'max_grad_norm': trial.suggest_float("max_grad_norm", 0.1, 1, log=True),
+        'gae_lambda': trial.suggest_float("gae_lambda", 0.1, 1, log=True),
         'learning_rate': trial.suggest_float("lr", 1e-5, 1, log=True),
-        'ent_coef': trial.suggest_float("ent_coef", 0.00000001, 0.1, log=True),
     }
 
 def optimize_agent(trial):
@@ -32,17 +37,20 @@ def optimize_agent(trial):
 
     env = VizDoomTrain(SCENARIO)
     env = Monitor(env)
-    model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, n_steps=2048, **model_params)
+    model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **model_params, n_steps=2048)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
-    callback = TrainCallback(10000, LOG_DIR + '/' + RUN_NAME)
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1) #decrease frequency of output with log_interval
-    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=3)
+    callback = TrainCallback(25000, LOG_DIR + '/' + RUN_NAME)
+    model.learn(total_timesteps=TOTAL_TIMESTEPS, callback=callback, log_interval=1)
+    mean_reward, _ = evaluate_policy(model, env, n_eval_episodes=10)
     return mean_reward
 
 if __name__ == '__main__':
-    study = optuna.create_study()
+    # for the distributed solution a mysql server is needed with a database names optuna
+    study = optuna.create_study(direction='maximize', study_name=STUDY_NAME,
+                                storage="postgresql://a2c:asdf4321@localhost/optuna", load_if_exists=True)
     try:
-        study.optimize(optimize_agent, n_trials=50, gc_after_trial=True)
+        study.optimize(optimize_agent, n_jobs=-1, n_trials=50, gc_after_trial=True)
     except KeyboardInterrupt:
         print('Interrupted by keyboard')
+
