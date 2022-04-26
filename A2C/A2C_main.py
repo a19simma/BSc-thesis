@@ -11,7 +11,7 @@ from stable_baselines3.common.monitor import Monitor
 from packaging import version
 
 SCENARIO = 'deadly_corridor'
-LOG_DIR = 'logs/' + SCENARIO + 'final-2'
+LOG_DIR = 'logs/' + SCENARIO + 'final-3'
 TOTAL_TIMESTEPS = 1e6
 
 env = VizDoomTrain(SCENARIO)
