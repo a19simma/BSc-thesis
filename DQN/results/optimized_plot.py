@@ -12,12 +12,14 @@ df_dqn_optimized_5 = pd.read_csv("optimized_5.csv", usecols=['rollout/ep_rew_mea
 
 df_dqn_optimized_merged = pd.concat([df_dqn_optimized_1,df_dqn_optimized_3,df_dqn_optimized_4,df_dqn_optimized_5], ignore_index=True)
 
+plt.figure(dpi=1200)
 sns.lineplot(x='time/episodes', y="rollout/ep_rew_mean", label="DQN optimized",data=df_dqn_optimized_merged, linewidth=1, color="blue", alpha=0.5)
 font = {'family' : 'DejaVu Sans',
         'size'   : 14}
 
 plt.rc('font', **font)
-plt.xlabel("Episodes")
-plt.ylabel("Reward")
+plt.xlabel("Episodes", fontsize=18)
+plt.ylabel("Reward", fontsize=18)
 plt.xlim(0,1.4e+4)
-plt.show()
+plt.ylim([0, 1])
+plt.savefig('DQN_optimized.png')

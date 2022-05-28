@@ -1,35 +1,35 @@
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from vizdoomEnv import VizDoomTrain
+from typing import Any, Dict
 from callback import TrainCallback
 from stable_baselines3 import DQN, A2C, PPO
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.evaluation import evaluate_policy
 import optuna
-
-# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
-# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
-# optuna-dashboard postgresql+psycopg2://a2c:asdf4321@localhost:5432/optuna
+import sqlcon  # use this to save connection details for the RDB
 
 SCENARIO = 'deadly_corridor'
-TOTAL_TIMESTEPS = 1e6
+TOTAL_TIMESTEPS = 2e6
 ALGORITHM = "A2C"
-STUDY_NAME = SCENARIO + "_" + ALGORITHM
+STUDY_NAME = SCENARIO + "_" + ALGORITHM + "_FINAL_TOTALLY"
 LOG_DIR = 'logs/' + STUDY_NAME
 
+#Variables and ranges taken from https://github.com/DLR-RM/rl-baselines3-zoo/blob/master/utils/hyperparams_opt.py
 
-#Variables and ranges taken from Optunas a2c example https://github.com/optuna/optuna-examples/blob/main/rl/sb3_simple.py
-def optimize_a2c(trial):
+def optimize_params(trial):
     return{
-        'gamma': trial.suggest_float("gamma", 0.1, 1, log=True),
-        'max_grad_norm': trial.suggest_float("max_grad_norm", 0.1, 1, log=True),
-        'gae_lambda': trial.suggest_float("gae_lambda", 0.1, 1, log=True),
-        'learning_rate': trial.suggest_float("lr", 1e-5, 1, log=True),
+        'learning_rate': trial.suggest_loguniform("learning_rate", 1e-5, 1),
+        'gamma': trial.suggest_categorical("gamma", [0.9, 0.95, 0.98, 0.99, 0.995, 0.999, 0.9999]),
+        'max_grad_norm': trial.suggest_categorical("max_grad_norm", [0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 2, 5]),
+        'gae_lambda': trial.suggest_categorical("gae_lambda", [0.8, 0.9, 0.92, 0.95, 0.98, 0.99, 1.0]),
+        'n_steps': trial.suggest_categorical("n_steps", [8, 16, 32, 64, 128, 256, 512, 1024, 2048]),
     }
 
+
 def optimize_agent(trial):
-    model_params = optimize_a2c(trial) 
+    model_params = optimize_params(trial)
     RUN_NAME = 'Trial_' + str(trial.number) + '_'
     for key in model_params:
         RUN_NAME += key + '=' + str(model_params[key]) + '_'
@@ -37,7 +37,7 @@ def optimize_agent(trial):
 
     env = VizDoomTrain(SCENARIO)
     env = Monitor(env)
-    model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **model_params, n_steps=2048)
+    model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, **model_params)
     logger = configure(LOG_DIR + '/' + RUN_NAME, ["stdout", "csv", "tensorboard"])
     model.set_logger(logger)
     callback = TrainCallback(25000, LOG_DIR + '/' + RUN_NAME)
@@ -48,7 +48,7 @@ def optimize_agent(trial):
 if __name__ == '__main__':
     # for the distributed solution a mysql server is needed with a database names optuna
     study = optuna.create_study(direction='maximize', study_name=STUDY_NAME,
-                                storage="postgresql://a2c:asdf4321@localhost/optuna", load_if_exists=True)
+                                storage=sqlcon.con, load_if_exists=True)
     try:
         study.optimize(optimize_agent, n_jobs=-1, n_trials=50, gc_after_trial=True)
     except KeyboardInterrupt:

@@ -12,7 +12,7 @@ env = Monitor(env)
 tkinter.Tk().withdraw()
 model_dir = filedialog.askopenfilename()
 
-model = DQN.load(model_dir)
+model = A2C.load(model_dir)
 for episode in range(10):
     obs = env.reset()
     done = False

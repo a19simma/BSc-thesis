@@ -11,12 +11,12 @@ from stable_baselines3.common.monitor import Monitor
 from packaging import version
 
 SCENARIO = 'deadly_corridor'
-LOG_DIR = 'logs/' + SCENARIO + 'final-3'
-TOTAL_TIMESTEPS = 1e6
+LOG_DIR = 'logs/' + SCENARIO
+TOTAL_TIMESTEPS = 2e6
 
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)
-model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0, learning_rate=0.0007, n_steps=2048)
+model = A2C('CnnPolicy', env, tensorboard_log=LOG_DIR, verbose=0)
 logger = configure(LOG_DIR, ["stdout", "csv", "tensorboard"])
 model.set_logger(logger)
 callback = TrainCallback(10000, LOG_DIR)

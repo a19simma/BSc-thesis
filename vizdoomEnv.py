@@ -10,7 +10,7 @@ import os.path
 # length of the number of buttons.
 #
 class VizDoomTrain(Env):
-    def __init__(self, scenario, visible=False):
+    def __init__(self, scenario, visible=True):
         super().__init__()
         self.game = DoomGame() #type: ignore
         config = os.path.join(scenarios_path, scenario + '.cfg')
