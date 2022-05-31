@@ -21,6 +21,7 @@ pandas = "*"
 matplotlib = "*"
 seaborn = "*"
 scipy = "*"
+sklearn = "*"
 
 [dev-packages]
 
