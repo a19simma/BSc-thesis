@@ -6,6 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(
 import sqlcon
 import optuna
 from matplotlib import pyplot as plt
+import seaborn as sns
 
 loaded_study = optuna.load_study(
     study_name="deadly_corridor_DQN", storage=sqlcon.con)
@@ -13,6 +14,7 @@ loaded_study = optuna.load_study(
 font = {'family': 'DejaVu Sans',
         'size': 14}
 
+sns.set(style="darkgrid", palette="muted", color_codes=True)
 plt.rc('font', **font)
 plt.rcParams["figure.figsize"] = (6,3)
 plt.figure(dpi=300)
