@@ -14,6 +14,7 @@ font = {'family': 'DejaVu Sans',
         'size': 14}
 
 plt.rc('font', **font)
+plt.rcParams["figure.figsize"] = (6,3)
 plt.figure(dpi=300)
 optuna.visualization.matplotlib.plot_param_importances(loaded_study)
 plt.tight_layout()
