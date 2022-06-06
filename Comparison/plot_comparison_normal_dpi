@@ -1,0 +1,29 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sqlalchemy import column
+sns.set_theme(style="whitegrid")
+
+df_a2c_default_evaluation = pd.read_csv("a2c_default_evaluation_sample.csv", sep=';')
+df_a2c_optimized_evaluation = pd.read_csv("a2c_optimized_evaluation_sample.csv", sep=';')
+df_dqn_default_evaluation = pd.read_csv("dqn_default_evaluation_sample.csv", sep=';')
+df_dqn_optimized_evaluation = pd.read_csv("dqn_optimized_evaluation_sample.csv", sep=';')
+df_ppo_default_evaluation = pd.read_csv("ppo_default_evaluation_sample.csv", sep=';')
+df_ppo_optimized_evaluation = pd.read_csv("ppo_optimized_evaluation_sample.csv", sep=';')
+
+df_comparison_merged = pd.concat([df_a2c_default_evaluation, df_a2c_optimized_evaluation, df_dqn_default_evaluation, 
+                        df_dqn_optimized_evaluation, df_ppo_default_evaluation, df_ppo_optimized_evaluation], ignore_index=True)
+
+plt.figure(dpi=300)
+ax = sns.boxplot(x="Algorithm", y="Reward", hue="Hyperparameter", data=df_comparison_merged, linewidth=2.5)
+font = {'family' : 'DejaVu Sans',
+        'size'   : 14}
+
+plt.rc('font', **font)
+plt.xlabel("Algorithm", fontsize=17)
+plt.ylabel("Reward", fontsize=17)
+plt.legend(loc='upper left')
+plt.tight_layout()
+plt.savefig('algorithm_comparison_no_dpi.png')
+
+

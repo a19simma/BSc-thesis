@@ -10,8 +10,8 @@ from stable_baselines3.common.evaluation import evaluate_policy
 env = VizDoomTrain('deadly_corridor')
 env = Monitor(env)
 model_dir = os.path.dirname(os.path.abspath(__file__))
-optimized_model = A2C.load(model_dir + "\\a2c_default_model.zip")
-default_model = DQN.load(model_dir + "\\dqn_default_model.zip")
+optimized_model = A2C.load(model_dir + "\\a2c_optimized_model.zip")
+default_model = A2C.load(model_dir + "\\a2c_default_model.zip")
 
 if not os.path.exists(model_dir + '\optimized_evaluation_sample.csv'):
     data_optimized = []    

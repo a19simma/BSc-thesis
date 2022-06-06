@@ -4,12 +4,16 @@ import pandas as pd
 from matplotlib import axes, pyplot as plt
 import seaborn as sns
 import optuna
+from matplotlib.pyplot import figure
 
 loaded_study = optuna.load_study(study_name="deadly_corridor_A2C_FINAL_TOTALLY", storage="postgresql://a2c:asdf4321@localhost/optuna")
+
+figure(figsize=(120, 6), dpi=300)
 
 font = {'family' : 'DejaVu Sans',
         'size'   : 14}
 
 plt.rc('font', **font)
 optuna.visualization.matplotlib.plot_optimization_history(loaded_study)
+plt.tight_layout()
 plt.show()

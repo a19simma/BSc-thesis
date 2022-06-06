@@ -13,13 +13,14 @@ df_a2c_default_3 = df_a2c_default_3[::10000]
 
 df_a2c_default_merged = pd.concat([df_a2c_default_1,df_a2c_default_2,df_a2c_default_3], ignore_index=True)
 
-plt.figure(dpi=1200)
+plt.figure(dpi=300)
 sns.lineplot(x='time/total_timesteps', y="rollout/ep_rew_mean", label="A2C Default",data=df_a2c_default_merged, linewidth=1, color="red", alpha=0.5)
 font = {'family' : 'DejaVu Sans',
         'size'   : 14}
 
 plt.rc('font', **font)
-plt.xlabel("Timesteps", fontsize=18)
-plt.ylabel("Reward", fontsize=18)
+plt.xlabel("Timesteps", fontsize=14)
+plt.ylabel("Reward", fontsize=14)
 plt.ylim([0, 1])
-plt.savefig('a2c_default.png')
+plt.tight_layout()
+plt.savefig('a2c_default_300_dpi.png')
