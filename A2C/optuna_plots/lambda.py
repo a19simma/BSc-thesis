@@ -14,7 +14,7 @@ font = {'family' : 'DejaVu Sans',
 
 plt.rc('font', **font)
 plt.rcParams["figure.figsize"] = (10,5)
-optuna.visualization.matplotlib.plot_slice(loaded_study, params=["learning_rate"])
-plt.title('A2C Learning rate')
+optuna.visualization.matplotlib.plot_slice(loaded_study, params=["gae_lambda"])
+plt.title('A2C GAE Lambda')
 plt.tight_layout()
-plt.savefig('a2c_h_learning_rate.png')
+plt.savefig('a2c_h_lambda.png')
