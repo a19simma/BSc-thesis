@@ -10,13 +10,13 @@ import time
 import numpy as np
 
 SCENARIO = 'deadly_corridor'
-MODEL_NAME = 'model_name'
+MODEL_NAME = 'best_model_2000000'
 
 env = VizDoomTrain(SCENARIO)
 env = Monitor(env)
 
 model = A2C.load(MODEL_NAME)
-for episode in range(10):
+for episode in range(2300):
     obs = env.reset()
     done = False
     total_reward = 0
