@@ -7,7 +7,7 @@ import optuna
 sns.set(style="darkgrid", palette="muted", color_codes=True)
 
 loaded_study = optuna.load_study(
-    study_name="deadly_corridor_DQN", storage=sqlcon.con)
+    study_name="deadly_corridor_PPOFresh", storage="mysql://root@localhost/PPO")
 
 font = {'family' : 'DejaVu Sans',
         'size'   : 14}
